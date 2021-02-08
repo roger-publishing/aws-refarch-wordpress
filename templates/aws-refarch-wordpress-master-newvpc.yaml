@@ -1017,8 +1017,6 @@ Resources:
       Parameters:
         ElasticFileSystem:
           !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
-        DatabaseCluster:
-          !GetAtt [ rds, Outputs.DatabaseCluster ]
         BurstCreditBalanceDecreaseAlarmArn:
           !GetAtt [ efsalarms, Outputs.BurstCreditBalanceDecreaseAlarmArn ]
         BurstCreditBalanceIncreaseAlarmArn:
@@ -1040,8 +1038,6 @@ Resources:
       Parameters:
         ElasticFileSystem:
           !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
-        DatabaseCluster:
-          !GetAtt [ rds, Outputs.DatabaseCluster ]
         PublicAlbFullName:
           !GetAtt [ publicalb, Outputs.PublicAlbFullName ]
         EfsCreateAlarms:

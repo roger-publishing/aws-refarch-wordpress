@@ -164,48 +164,15 @@ Conditions:
 
 Resources:
 
-  DatabaseCluster:
-    Type: AWS::RDS::DBCluster
-    Properties:
-      BackupRetentionPeriod: 30
-      DatabaseName: !Ref DatabaseName
-      DBSubnetGroupName: !Ref DataSubnetGroup
-      Engine: aurora
-      KmsKeyId:
-        !If [ UseAWS-ManagedCMK, !Ref 'AWS::NoValue', !Ref DatabaseCmk ]
-      MasterUsername: !If [ NoSnapshot, !Ref DatabaseMasterUsername, !Ref 'AWS::NoValue']
-      MasterUserPassword: !If [ NoSnapshot, !Ref DatabaseMasterPassword, !Ref 'AWS::NoValue']
-      Port: 3306
-      StorageEncrypted: !Ref DatabaseEncrpytedBoolean
-      SnapshotIdentifier: !If [ NoSnapshot, !Ref 'AWS::NoValue', !Ref DatabaseRestoreSnapshot]
-      Tags:
-        - Key: Name
-          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
-      VpcSecurityGroupIds:
-      - !Ref DatabaseSecurityGroup
   DatabaseInstance0:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
     Properties:
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: true
-      DBClusterIdentifier: !Ref DatabaseCluster
       DBInstanceClass: !Ref DatabaseInstanceType
       DBSubnetGroupName: !Ref DataSubnetGroup
-      Engine: aurora
-      Tags:
-        - Key: Name
-          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
-  DatabaseInstance1:
-    Type: AWS::RDS::DBInstance
-    DeletionPolicy: Delete
-    Properties:
-      AllowMajorVersionUpgrade: false
-      AutoMinorVersionUpgrade: true
-      DBClusterIdentifier: !Ref DatabaseCluster
-      DBInstanceClass: !Ref DatabaseInstanceType
-      DBSubnetGroupName: !Ref DataSubnetGroup
-      Engine: aurora
+      Engine: mysql
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
@@ -240,16 +207,12 @@ Resources:
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
 
 Outputs:
-  DatabaseCluster:
-    Value: !Ref DatabaseCluster
   DatabaseName:
     Value: !Ref DatabaseName
   DatabaseInstance0:
     Value: !Ref DatabaseInstance0
-  DatabaseInstance1:
-    Value: !Ref DatabaseInstance1
   DataSubnetGroup:
     Value: !Ref DataSubnetGroup
   DatabaseClusterEndpointAddress:
-    Value: !GetAtt DatabaseCluster.Endpoint.Address
+    Value: !GetAtt DatabaseInstance0.Endpoint.Address
 
