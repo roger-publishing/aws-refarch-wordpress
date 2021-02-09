@@ -472,7 +472,7 @@ Resources:
           !If
             [ PHP56,
             !Ref WebLaunchConfiguration56,
-            !Ref WebLaunchConfiguration732
+            !Ref WebLaunchConfiguration733
             ]          
           ]
       MaxSize: !Ref WebAsgMax
@@ -917,7 +917,7 @@ Resources:
             mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
             /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration56 --region ${AWS::Region}
             /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
-  WebLaunchConfiguration732:
+  WebLaunchConfiguration733:
     Condition: PHP73
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
@@ -1121,7 +1121,7 @@ Resources:
             yum update -y
             mkdir -p /var/www/wordpress
             mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
-            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration732 --region ${AWS::Region}
+            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration733 --region ${AWS::Region}
             /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
 
 
