@@ -165,7 +165,18 @@ Resources:
       AutoMinorVersionUpgrade: true
       DBInstanceClass: !Ref DatabaseInstanceType
       DBSubnetGroupName: !Ref DataSubnetGroup
-      Engine: mysql
+      BackupRetentionPeriod: 30
+      DatabaseName: !Ref DatabaseName
+      Engine: aurora
+      KmsKeyId:
+        !If [ UseAWS-ManagedCMK, !Ref 'AWS::NoValue', !Ref DatabaseCmk ]
+      MasterUsername: !If [ NoSnapshot, !Ref DatabaseMasterUsername, !Ref 'AWS::NoValue']
+      MasterUserPassword: !If [ NoSnapshot, !Ref DatabaseMasterPassword, !Ref 'AWS::NoValue']
+      Port: 3306
+      StorageEncrypted: !Ref DatabaseEncrpytedBoolean
+      SnapshotIdentifier: !If [ NoSnapshot, !Ref 'AWS::NoValue', !Ref DatabaseRestoreSnapshot]
+      VpcSecurityGroupIds:
+        - !Ref DatabaseSecurityGroup
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
