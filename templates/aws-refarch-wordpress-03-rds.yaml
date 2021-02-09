@@ -9,7 +9,12 @@ Metadata:
     Description: Darryl Osborne (darrylo@amazon.com)
   License:
     Description: 'Copyright 2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
-                  SPDX-License-Identifier: MIT-0'
+      Licensed under the Amazon Software License (the "License"). You may not use this file
+      except in compliance with the License. A copy of the License is located at
+      http://aws.amazon.com/asl/
+      or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+      BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+      License for the specific language governing permissions and limitations under the License.'
   
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -36,8 +41,6 @@ Metadata:
         default: DB Master Username
       DatabaseMasterPassword:
         default: DB Master Password
-      DatabaseRestoreSnapshot:
-        default: Snapshot to restore from
       DatabaseName:
         default: DB Name
       DatabaseSecurityGroup:
@@ -62,11 +65,6 @@ Parameters:
   DatabaseInstanceType:
     AllowedValues:
       - db.t3.micro
-      - db.t3.small
-      - db.t3.medium
-      - db.t3.large
-      - db.t3.xlarge
-      - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class.
     Default: db.t3.micro
     Description: The Amazon RDS database instance class.
@@ -89,9 +87,6 @@ Parameters:
   DatabaseName:
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master database name.
-    Type: String
-  DatabaseRestoreSnapshot:
-    Description: The snapshot name to restore from.
     Type: String
   DatabaseSecurityGroup:
     Description: Select the database security group.
@@ -152,31 +147,28 @@ Conditions:
   Subnet5: !Condition NumberOfSubnets6
   UseAWS-ManagedCMK:
     !Equals ['', !Ref DatabaseCmk]
-  NoSnapshot:
-    !Equals ['', !Ref DatabaseRestoreSnapshot]
 
 Resources:
-
   DatabaseInstance0:
     Type: AWS::RDS::DBInstance
-    DeletionPolicy: Delete
+    DeletionPolicy: Snapshot
     Properties:
-      AllowMajorVersionUpgrade: false
-      AutoMinorVersionUpgrade: true
-      DBInstanceClass: !Ref DatabaseInstanceType
-      DBSubnetGroupName: !Ref DataSubnetGroup
-      BackupRetentionPeriod: 30
-      DatabaseName: !Ref DatabaseName
-      Engine: aurora
+      DBName: !Ref DatabaseName
       KmsKeyId:
         !If [ UseAWS-ManagedCMK, !Ref 'AWS::NoValue', !Ref DatabaseCmk ]
-      MasterUsername: !If [ NoSnapshot, !Ref DatabaseMasterUsername, !Ref 'AWS::NoValue']
-      MasterUserPassword: !If [ NoSnapshot, !Ref DatabaseMasterPassword, !Ref 'AWS::NoValue']
-      Port: 3306
+      MasterUsername: !Ref DatabaseMasterUsername
+      MasterUserPassword: !Ref DatabaseMasterPassword
       StorageEncrypted: !Ref DatabaseEncrpytedBoolean
-      SnapshotIdentifier: !If [ NoSnapshot, !Ref 'AWS::NoValue', !Ref DatabaseRestoreSnapshot]
-      VpcSecurityGroupIds:
+      VPCSecurityGroups:
         - !Ref DatabaseSecurityGroup
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBInstanceClass: 'db.t3.micro'
+      DBSubnetGroupName: !Ref DataSubnetGroup
+      Engine: mysql
+      EngineVersion: '8.0.21'
+      StorageType: gp2
+      AllocatedStorage: '20'
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
@@ -211,6 +203,8 @@ Resources:
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
 
 Outputs:
+  DatabaseCluster:
+    Value: !Ref DatabaseInstance0
   DatabaseName:
     Value: !Ref DatabaseName
   DatabaseInstance0:
