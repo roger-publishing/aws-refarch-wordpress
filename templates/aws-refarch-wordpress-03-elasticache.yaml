@@ -71,12 +71,13 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
   NumberOfSubnets:
     AllowedValues:
+    - 1
     - 2
     - 3
     - 4
     - 5
     - 6
-    Default: 3
+    Default: 2
     Description: Number of subnets. This must match your selections in the list of subnets below.
     Type: String 
   Subnet:
@@ -129,12 +130,11 @@ Resources:
   ElastiCacheCluster:
     Type: AWS::ElastiCache::CacheCluster
     Properties:
-      AZMode: cross-az
+      AZMode: single-az
       CacheNodeType: !Ref ElastiCacheNodeType
       CacheSubnetGroupName: !Ref ElastiCacheSubnetGroup
       Engine: memcached
-      NumCacheNodes:
-        !Ref NumberOfSubnets
+      NumCacheNodes: 1
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
